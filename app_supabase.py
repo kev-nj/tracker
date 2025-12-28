@@ -32,9 +32,22 @@ SUPABASE_KEY = os.getenv('SUPABASE_KEY')
 SUPABASE_SERVICE_KEY = os.getenv('SUPABASE_SERVICE_KEY')
 
 # Initialize clients
-openai.api_key = OPENAI_API_KEY
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-supabase_admin: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+try:
+    if not OPENAI_API_KEY:
+        raise ValueError("OPENAI_API_KEY is not set")
+    if not SUPABASE_URL or not SUPABASE_KEY or not SUPABASE_SERVICE_KEY:
+        raise ValueError("Supabase credentials are not set")
+    
+    openai.api_key = OPENAI_API_KEY
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    supabase_admin: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+except Exception as e:
+    print(f"Error initializing clients: {e}")
+    print(f"OPENAI_API_KEY set: {bool(OPENAI_API_KEY)}")
+    print(f"SUPABASE_URL set: {bool(SUPABASE_URL)}")
+    print(f"SUPABASE_KEY set: {bool(SUPABASE_KEY)}")
+    print(f"SUPABASE_SERVICE_KEY set: {bool(SUPABASE_SERVICE_KEY)}")
+    raise
 
 
 # Authentication decorator
@@ -511,6 +524,9 @@ def status():
             'error': str(e)
         }), 500
 
+
+# Vercel needs this
+application = app
 
 if __name__ == '__main__':
     # Run scraper once at startup if database is empty

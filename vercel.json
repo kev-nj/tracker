@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/app_supabase.py"
+      "destination": "/index.py"
     }
   ]
 }

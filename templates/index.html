@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UK Finance Graduate Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header-auth {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .auth-user-info {
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .auth-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .auth-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            padding: 20px 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .filter-select {
+            min-width: 200px;
+        }
+        
+        .filter-select select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .filter-select select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .roles-container {
+            padding: 30px;
+            max-height: calc(100vh - 400px);
+            overflow-y: auto;
+        }
+        
+        .role-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .role-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .role-card.open {
+            border-left: 5px solid #28a745;
+        }
+        
+        .role-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        
+        .role-title {
+            flex: 1;
+        }
+        
+        .role-title h3 {
+            color: #2d3748;
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        .company-name {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .badge-open {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-closed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-category {
+            background: #e7e8ff;
+            color: #667eea;
+        }
+        
+        .role-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .detail-item {
+            font-size: 0.9rem;
+        }
+        
+        .detail-label {
+            color: #6c757d;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 3px;
+        }
+        
+        .detail-value {
+            color: #2d3748;
+        }
+        
+        .role-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .close {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+        
+        .close:hover {
+            opacity: 0.8;
+        }
+        
+        .modal-body {
+            padding: 30px;
+            max-height: calc(80vh - 160px);
+            overflow-y: auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+        }
+        
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .cover-letter-output {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            border-left: 4px solid #667eea;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        .no-results h3 {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-auth" id="auth-section">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            <h1>🎓 UK Finance Graduate Tracker</h1>
+            <p>AI-Powered Cover Letter Generator for Graduate Roles</p>
+        </header>
+        
+        <div class="status-bar">
+            <div class="stat">
+                <div class="stat-number" id="total-roles">-</div>
+                <div class="stat-label">Total Roles</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="open-roles">-</div>
+                <div class="stat-label">Currently Open</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="last-updated">-</div>
+                <div class="stat-label">Last Updated</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="search" placeholder="Search by company, role...">
+            </div>
+            <div class="filter-select">
+                <select id="category-filter">
+                    <option value="all">All Categories</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" id="show-open-btn">Show Open Roles Only</button>
+            <button class="btn btn-secondary" id="show-all-btn" style="display: none;">Show All Roles</button>
+            <button class="btn btn-success" id="refresh-btn">🔄 Refresh Data</button>
+        </div>
+        
+        <div class="roles-container" id="roles-container">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading roles...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cover Letter Modal -->
+    <div id="cover-letter-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✨ Generate Cover Letter</h2>
+                <button class="close" onclick="closeCoverLetterModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-role-info"></div>
+                
+                <div id="auth-required-message" style="display: none; background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border: 2px solid #667eea; border-radius: 12px; padding: 30px; margin-bottom: 20px; text-align: center;">
+                    <div style="font-size: 56px; margin-bottom: 15px;">🔐</div>
+                    <h3 style="margin: 0 0 10px 0; color: #2d3748; font-size: 20px;">Authentication Required</h3>
+                    <p style="color: #4a5568; margin-bottom: 20px; font-size: 15px; line-height: 1.6;">Please sign in and complete your profile to generate personalized cover letters tailored to your experience and qualifications.</p>
+                    <button class="btn btn-primary" onclick="closeCoverLetterModal(); openLoginModal();" style="padding: 12px 32px; font-size: 15px; font-weight: 600; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; cursor: pointer; color: white; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">Sign In to Continue</button>
+                </div>
+                
+                <button class="btn btn-primary" onclick="generateCoverLetter()" style="width: 100%;" id="generate-btn">
+                    Generate Cover Letter
+                </button>
+                
+                <div id="cover-letter-result" style="display: none; margin-top: 20px;">
+                    <h3 style="margin-bottom: 15px;">Your Cover Letter:</h3>
+                    <div class="cover-letter-output" id="cover-letter-text"></div>
+                    <button class="btn btn-secondary" onclick="copyCoverLetter()" style="margin-top: 15px; width: 100%;">
+                        📋 Copy to Clipboard
+                    </button>
+                </div>
+                
+                <div id="cover-letter-loading" style="display: none;">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Generating your personalized cover letter...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 420px; padding: 40px;">
+            <span class="close" onclick="closeLoginModal()" style="font-size: 28px; color: #999;">&times;</span>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="font-size: 48px; margin-bottom: 15px;">🔐</div>
+                <h2 style="margin: 0; color: #2d3748; font-size: 24px;">Welcome Back</h2>
+                <p style="color: #718096; margin-top: 8px; font-size: 14px;">Sign in to access your profile and generate cover letters</p>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px;">Email Address</label>
+                <input type="email" id="login-email" placeholder="your@email.com" style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; transition: border-color 0.2s;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+            </div>
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px;">Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password" style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; transition: border-color 0.2s;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+            </div>
+            <button onclick="handleLogin()" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 16px; font-weight: 600; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">Sign In</button>
+            <div id="login-error" style="color: #e53e3e; background: #fff5f5; padding: 12px; border-radius: 6px; margin-top: 15px; display: none; font-size: 14px; border-left: 3px solid #e53e3e;"></div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 700px; max-height: 85vh; overflow-y: auto; padding: 40px;">
+            <span class="close" onclick="closeProfileModal()" style="font-size: 28px; color: #999;">&times;</span>
+            <div style="text-align: center; margin-bottom: 35px;">
+                <div style="font-size: 48px; margin-bottom: 15px;">👤</div>
+                <h2 style="margin: 0; color: #2d3748; font-size: 26px;">My Profile</h2>
+                <p style="color: #718096; margin-top: 8px; font-size: 14px;">Complete your profile to generate personalized cover letters</p>
+            </div>
+            
+            <div style="display: grid; gap: 20px;">
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px;">Full Name</label>
+                    <input type="text" id="profile-name" placeholder="John Doe" style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; transition: border-color 0.2s;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px;">Phone</label>
+                    <input type="tel" id="profile-phone" placeholder="+44 7XXX XXXXXX" style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; transition: border-color 0.2s;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px;">University</label>
+                    <input type="text" id="profile-university" placeholder="University of..." style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; transition: border-color 0.2s;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px;">Degree</label>
+                        <input type="text" id="profile-degree" placeholder="BSc Economics" style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; transition: border-color 0.2s;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px;">Grad Year</label>
+                        <input type="number" id="profile-grad-year" placeholder="2026" style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; transition: border-color 0.2s;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px;">GPA</label>
+                        <input type="text" id="profile-gpa" placeholder="3.8" style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; transition: border-color 0.2s;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+                    </div>
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px;">Skills <span style="color: #a0aec0; font-weight: normal;">(comma-separated)</span></label>
+                    <input type="text" id="profile-skills" placeholder="Python, Financial Modeling, Excel, VBA" style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; transition: border-color 0.2s;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px;">Experience</label>
+                    <textarea id="profile-experience" rows="3" placeholder="Describe your internships, work experience, and relevant projects..." style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; font-family: inherit; transition: border-color 0.2s; resize: vertical;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px;">Achievements</label>
+                    <textarea id="profile-achievements" rows="2" placeholder="Awards, scholarships, honors..." style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; font-family: inherit; transition: border-color 0.2s; resize: vertical;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px;">Career Interests</label>
+                    <textarea id="profile-interests" rows="2" placeholder="Investment banking, trading, asset management..." style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; font-family: inherit; transition: border-color 0.2s; resize: vertical;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px;">LinkedIn URL</label>
+                    <input type="url" id="profile-linkedin" placeholder="https://linkedin.com/in/yourprofile" style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; transition: border-color 0.2s;" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'">
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; display: flex; gap: 12px;">
+                <button onclick="saveProfile()" class="btn btn-primary" style="flex: 1; padding: 14px; font-size: 16px; font-weight: 600; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">Save Profile</button>
+                <button onclick="closeProfileModal()" class="btn btn-secondary" style="padding: 14px 24px; font-size: 16px; font-weight: 600; background: #f7fafc; color: #4a5568; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#edf2f7'" onmouseout="this.style.background='#f7fafc'">Cancel</button>
+            </div>
+            <div id="profile-message" style="margin-top: 15px; display: none; padding: 12px 16px; border-radius: 8px; font-size: 14px; font-weight: 500;"></div>
+        </div>
+    </div>
+    
+    <script>
+        let allRoles = [];
+        let currentRole = null;
+        let showingOpenOnly = false;
+        let selectedCategory = 'all';
+        let authToken = localStorage.getItem('auth_token');
+        let currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+        
+        // Initialize auth UI on load
+        updateAuthUI();
+        
+        // Load initial data
+        async function loadData(openOnly = false) {
+            try {
+                const response = await fetch(`/api/roles?open=${openOnly}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    allRoles = data.roles;
+                    populateCategoryFilter();
+                    applyFilters();
+                    updateStats();
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('roles-container').innerHTML = 
+                    '<div class="no-results"><h3>Error loading data</h3><p>Please try refreshing the page.</p></div>';
+            }
+        }
+        
+        async function updateStats() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('total-roles').textContent = data.total_roles;
+                    document.getElementById('open-roles').textContent = data.open_roles;
+                    
+                    if (data.last_updated) {
+                        const date = new Date(data.last_updated);
+                        document.getElementById('last-updated').textContent = 
+                            date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        }
+        
+        function displayRoles(roles) {
+            const container = document.getElementById('roles-container');
+            
+            if (roles.length === 0) {
+                container.innerHTML = '<div class="no-results"><h3>No roles found</h3><p>Try adjusting your filters or search.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = roles.map(role => `
+                <div class="role-card ${role.is_open ? 'open' : ''}">
+                    <div class="role-header">
+                        <div class="role-title">
+                            <span class="company-name">${role.company_name}</span>
+                            <h3>${role.role_title}</h3>
+                        </div>
+                        <div>
+                            <span class="badge ${role.is_open ? 'badge-open' : 'badge-closed'}">
+                                ${role.is_open ? '✓ Open' : '✗ Closed'}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <span class="badge badge-category">${role.category}</span>
+                    </div>
+                    
+                    <div class="role-details">
+                        ${role.application_opens ? `<div class="detail-item"><span class="detail-label">Opens:</span><span class="detail-value">${role.application_opens}</span></div>` : ''}
+                        ${role.application_closes ? `<div class="detail-item"><span class="detail-label">Closes:</span><span class="detail-value">${role.application_closes}</span></div>` : ''}
+                        ${role.interview_stages ? `<div class="detail-item"><span class="detail-label">Stages:</span><span class="detail-value">${role.interview_stages}</span></div>` : ''}
+                        ${role.cv_required ? `<div class="detail-item"><span class="detail-label">CV:</span><span class="detail-value">${role.cv_required}</span></div>` : ''}
+                        ${role.cover_letter ? `<div class="detail-item"><span class="detail-label">Cover Letter:</span><span class="detail-value">${role.cover_letter}</span></div>` : ''}
+                    </div>
+                    
+                    ${role.notes ? `<p style="color: #6c757d; margin: 10px 0; font-size: 0.9rem;"><strong>Note:</strong> ${role.notes}</p>` : ''}
+                    
+                    <div class="role-actions">
+                        <button class="btn btn-primary" onclick='openCoverLetterModal(${JSON.stringify(role).replace(/'/g, "&#39;")})'>
+                            ✨ Generate Cover Letter
+                        </button>
+                        ${role.role_link ? `<button class="btn btn-secondary" onclick="window.open('${role.role_link}', '_blank')">View Role</button>` : ''}
+                        ${role.company_link ? `<button class="btn btn-secondary" onclick="window.open('${role.company_link}', '_blank')">Company Website</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function openCoverLetterModal(role) {
+            currentRole = role;
+            document.getElementById('modal-role-info').innerHTML = `
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 10px;">${role.company_name} - ${role.role_title}</h3>
+                    ${role.notes ? `<p style="color: #6c757d;">${role.notes}</p>` : ''}
+                </div>
+            `;
+            document.getElementById('cover-letter-result').style.display = 'none';
+            
+            // Check if user is logged in
+            if (!authToken) {
+                document.getElementById('auth-required-message').style.display = 'block';
+                document.getElementById('generate-btn').disabled = true;
+            } else {
+                document.getElementById('auth-required-message').style.display = 'none';
+                document.getElementById('generate-btn').disabled = false;
+            }
+            
+            document.getElementById('cover-letter-modal').style.display = 'block';
+        }
+        
+        function closeCoverLetterModal() {
+            document.getElementById('cover-letter-modal').style.display = 'none';
+            currentRole = null;
+        }
+        
+        async function generateCoverLetter() {
+            if (!currentRole || !authToken) return;
+            document.getElementById('cover-letter-loading').style.display = 'block';
+            document.getElementById('cover-letter-result').style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/generate-cover-letter', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        company: currentRole.company_name,
+                        role: currentRole.role_title,
+                        company_link: currentRole.company_link,
+                        role_link: currentRole.role_link,
+                        notes: currentRole.notes
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('cover-letter-text').textContent = data.cover_letter;
+                    document.getElementById('cover-letter-result').style.display = 'block';
+                } else {
+                    alert('Error generating cover letter: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error generating cover letter. Please try again.');
+            } finally {
+                document.getElementById('cover-letter-loading').style.display = 'none';
+            }
+        }
+        
+        function copyCoverLetter() {
+            const text = document.getElementById('cover-letter-text').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Cover letter copied to clipboard!');
+            });
+        }
+        
+        function populateCategoryFilter() {
+            const categories = [...new Set(allRoles.map(role => role.category))].sort();
+            const select = document.getElementById('category-filter');
+            
+            // Keep "All Categories" and add others
+            select.innerHTML = '<option value="all">All Categories</option>';
+            categories.forEach(cat => {
+                if (cat) {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    option.textContent = cat;
+                    select.appendChild(option);
+                }
+            });
+        }
+        
+        function applyFilters() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            
+            let filtered = allRoles;
+            
+            // Apply category filter
+            if (selectedCategory !== 'all') {
+                filtered = filtered.filter(role => role.category === selectedCategory);
+            }
+            
+            // Apply search filter
+            if (searchTerm) {
+                filtered = filtered.filter(role => 
+                    role.company_name.toLowerCase().includes(searchTerm) ||
+                    role.role_title.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            displayRoles(filtered);
+        }
+        
+        // Search functionality
+        document.getElementById('search').addEventListener('input', applyFilters);
+        
+        // Category filter
+        document.getElementById('category-filter').addEventListener('change', (e) => {
+            selectedCategory = e.target.value;
+            applyFilters();
+        });
+        
+        // Filter buttons
+        document.getElementById('show-open-btn').addEventListener('click', () => {
+            showingOpenOnly = true;
+            document.getElementById('show-open-btn').style.display = 'none';
+            document.getElementById('show-all-btn').style.display = 'inline-block';
+            selectedCategory = 'all';
+            document.getElementById('category-filter').value = 'all';
+            loadData(true);
+        });
+        
+        document.getElementById('show-all-btn').addEventListener('click', () => {
+            showingOpenOnly = false;
+            document.getElementById('show-open-btn').style.display = 'inline-block';
+            document.getElementById('show-all-btn').style.display = 'none';
+            selectedCategory = 'all';
+            document.getElementById('category-filter').value = 'all';
+            loadData(false);
+        });
+        
+        // Refresh button
+        document.getElementById('refresh-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('refresh-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Refreshing...';
+            
+            try {
+                await fetch('/api/scrape-now', { method: 'POST' });
+                await loadData(showingOpenOnly);
+                alert('Data refreshed successfully!');
+            } catch (error) {
+                alert('Error refreshing data: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔄 Refresh Data';
+            }
+        });
+        
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('cover-letter-modal');
+            if (event.target === modal) {
+                closeCoverLetterModal();
+            }
+        }
+        
+        // Authentication Functions
+        function updateAuthUI() {
+            const authSection = document.getElementById('auth-section');
+            if (authToken && currentUser) {
+                authSection.innerHTML = `
+                    <span class="auth-user-info">${currentUser.email}</span>
+                    <button class="auth-btn" onclick="openProfileModal()">Profile</button>
+                    <button class="auth-btn" onclick="handleLogout()">Logout</button>
+                `;
+            } else {
+                authSection.innerHTML = `
+                    <button class="auth-btn" onclick="openLoginModal()">Login</button>
+                `;
+            }
+        }
+        
+        function openLoginModal() {
+            document.getElementById('login-modal').style.display = 'block';
+        }
+        
+        function closeLoginModal() {
+            document.getElementById('login-modal').style.display = 'none';
+            document.getElementById('login-error').style.display = 'none';
+        }
+        
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                document.getElementById('login-error').textContent = 'Please fill in all fields';
+                document.getElementById('login-error').style.display = 'block';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    authToken = data.session.access_token;
+                    currentUser = data.user;
+                    localStorage.setItem('auth_token', authToken);
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    updateAuthUI();
+                    closeLoginModal();
+                    loadProfile(); // Load profile immediately after login
+                } else {
+                    document.getElementById('login-error').textContent = data.error || 'Login failed';
+                    document.getElementById('login-error').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('login-error').textContent = 'Network error';
+                document.getElementById('login-error').style.display = 'block';
+            }
+        }
+        
+        async function handleLogout() {
+            try {
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+            } catch (e) {}
+            
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+            updateAuthUI();
+        }
+        
+        function openProfileModal() {
+            loadProfile();
+            document.getElementById('profile-modal').style.display = 'block';
+        }
+        
+        function closeProfileModal() {
+            document.getElementById('profile-modal').style.display = 'none';
+        }
+        
+        async function loadProfile() {
+            if (!authToken) return;
+            
+            try {
+                const response = await fetch('/api/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.profile) {
+                    const p = data.profile;
+                    document.getElementById('profile-name').value = p.full_name || '';
+                    document.getElementById('profile-phone').value = p.phone || '';
+                    document.getElementById('profile-university').value = p.university || '';
+                    document.getElementById('profile-degree').value = p.degree || '';
+                    document.getElementById('profile-grad-year').value = p.graduation_year || '';
+                    document.getElementById('profile-gpa').value = p.gpa || '';
+                    document.getElementById('profile-skills').value = Array.isArray(p.skills) ? p.skills.join(', ') : '';
+                    document.getElementById('profile-experience').value = p.experience || '';
+                    document.getElementById('profile-achievements').value = p.achievements || '';
+                    document.getElementById('profile-interests').value = p.interests || '';
+                    document.getElementById('profile-linkedin').value = p.linkedin_url || '';
+                }
+            } catch (error) {
+                console.error('Failed to load profile:', error);
+            }
+        }
+        
+        async function saveProfile() {
+            if (!authToken) return;
+            
+            const skills = document.getElementById('profile-skills').value
+                .split(',')
+                .map(s => s.trim())
+                .filter(s => s);
+            
+            const profileData = {
+                full_name: document.getElementById('profile-name').value,
+                phone: document.getElementById('profile-phone').value,
+                university: document.getElementById('profile-university').value,
+                degree: document.getElementById('profile-degree').value,
+                graduation_year: document.getElementById('profile-grad-year').value ? parseInt(document.getElementById('profile-grad-year').value) : null,
+                gpa: document.getElementById('profile-gpa').value,
+                skills: skills,
+                experience: document.getElementById('profile-experience').value,
+                achievements: document.getElementById('profile-achievements').value,
+                interests: document.getElementById('profile-interests').value,
+                linkedin_url: document.getElementById('profile-linkedin').value
+            };
+            
+            try {
+                const response = await fetch('/api/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(profileData)
+                });
+                
+                const data = await response.json();
+                
+                const messageDiv = document.getElementById('profile-message');
+                if (data.success) {
+                    messageDiv.innerHTML = '<div style="display: flex; align-items: center; justify-content: space-between;"><span style="color: #22c55e;">✓ Profile saved successfully!</span><button onclick="closeProfileModal()" style="background: #22c55e; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;" onmouseover="this.style.background=\'#16a34a\'" onmouseout="this.style.background=\'#22c55e\'">Close</button></div>';
+                    messageDiv.style.background = '#f0fdf4';
+                    messageDiv.style.border = '2px solid #22c55e';
+                    messageDiv.style.display = 'block';
+                } else {
+                    messageDiv.textContent = 'Error saving profile: ' + data.error;
+                    messageDiv.style.background = '#fef2f2';
+                    messageDiv.style.color = '#ef4444';
+                    messageDiv.style.border = '2px solid #ef4444';
+                    messageDiv.style.display = 'block';
+                }
+            } catch (error) {
+                const messageDiv = document.getElementById('profile-message');
+                messageDiv.textContent = 'Network error';
+                messageDiv.style.background = '#fef2f2';
+                messageDiv.style.color = '#ef4444';
+                messageDiv.style.border = '2px solid #ef4444';
+                messageDiv.style.display = 'block';
+            }
+        }
+        
+        // Initial load
+        loadData();
+        
+        // Auto-refresh stats every 5 minutes
+        setInterval(updateStats, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

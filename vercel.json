@@ -1,15 +1,8 @@
 {
-  "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "app_supabase.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "app_supabase.py"
+      "source": "/(.*)",
+      "destination": "/app_supabase.py"
     }
   ]
 }

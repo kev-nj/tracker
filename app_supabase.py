@@ -31,23 +31,29 @@ SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY')
 SUPABASE_SERVICE_KEY = os.getenv('SUPABASE_SERVICE_KEY')
 
-# Initialize clients
-try:
-    if not OPENAI_API_KEY:
-        raise ValueError("OPENAI_API_KEY is not set")
-    if not SUPABASE_URL or not SUPABASE_KEY or not SUPABASE_SERVICE_KEY:
-        raise ValueError("Supabase credentials are not set")
+# Initialize clients (lazy load to avoid import errors)
+supabase: Client = None
+supabase_admin: Client = None
+
+def get_supabase_clients():
+    """Initialize and return Supabase clients (lazy loading)"""
+    global supabase, supabase_admin
     
+    if supabase is None:
+        if not SUPABASE_URL or not SUPABASE_KEY:
+            raise ValueError("Supabase URL or KEY not set")
+        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    
+    if supabase_admin is None:
+        if not SUPABASE_SERVICE_KEY:
+            raise ValueError("Supabase SERVICE_KEY not set")
+        supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+    
+    return supabase, supabase_admin
+
+# Set OpenAI API key
+if OPENAI_API_KEY:
     openai.api_key = OPENAI_API_KEY
-    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-    supabase_admin: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-except Exception as e:
-    print(f"Error initializing clients: {e}")
-    print(f"OPENAI_API_KEY set: {bool(OPENAI_API_KEY)}")
-    print(f"SUPABASE_URL set: {bool(SUPABASE_URL)}")
-    print(f"SUPABASE_KEY set: {bool(SUPABASE_KEY)}")
-    print(f"SUPABASE_SERVICE_KEY set: {bool(SUPABASE_SERVICE_KEY)}")
-    raise
 
 
 # Authentication decorator
@@ -94,6 +100,8 @@ def run_scraper():
 def import_csv_to_supabase(csv_file):
     """Import CSV data to Supabase"""
     try:
+        supabase, supabase_admin = get_supabase_clients()
+        
         with open(csv_file, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             roles = []
@@ -239,6 +247,11 @@ def fetch_page_content(url):
 @app.route('/')
 def index():
     """Serve the main page"""
+    # Initialize Supabase clients on first request
+    try:
+        get_supabase_clients()
+    except Exception as e:
+        print(f"Warning: Could not initialize Supabase clients: {e}")
     return render_template('index.html')
 
 
@@ -254,6 +267,8 @@ def index():
 def login():
     """User login"""
     try:
+        supabase, supabase_admin = get_supabase_clients()
+        
         data = request.json
         email = data.get('email')
         password = data.get('password')
@@ -344,6 +359,7 @@ def get_roles():
     open_only = request.args.get('open', 'false').lower() == 'true'
     
     try:
+        supabase, supabase_admin = get_supabase_clients()
         response = supabase.table('graduate_roles').select('*').execute()
         roles = response.data
         
